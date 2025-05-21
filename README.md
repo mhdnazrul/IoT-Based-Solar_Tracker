@@ -1,201 +1,116 @@
-## 🌞 IoT-Based Solar Tracker Using ESP8266, Arduino Uno
+🌞 IoT-Based Solar Tracker using ESP8266 & Arduino
+This project is designed to create an IoT-based solar tracking system that automatically aligns a solar panel using two LDRs and a servo motor to maximize sunlight exposure. The system integrates Arduino and ESP8266 (NodeMCU) via serial communication and sends real-time data to the Blynk app for remote monitoring and control.
 
-This project demonstrates a smart solar tracking system that rotates a solar panel or device to follow the direction of maximum sunlight. It uses two **LDRs** to detect light intensity, a **servo motor** to adjust the position, and integrates with **Blynk IoT** using an **ESP8266 NodeMCU** to monitor the system remotely in real-time.
+📌 Features
+📡 LDR Sensors: Detect the light intensity from two directions.
 
----
+🔄 Servo Motor: Adjusts the angle of the solar panel based on the light difference.
 
-## 🔍 Overview
+💡 LED Control: An LED can be remotely turned on/off from Blynk.
 
-The system performs the following functions:
+📊 Real-time Monitoring: Live LDR readings, servo angle, and LED status shown on Blynk app.
 
-* **LDR Sensors (x2):** Continuously measure light intensity from two directions.
-* **Servo Motor:** Rotates the solar panel toward the LDR receiving more light, ensuring optimal sunlight tracking.
-* **ESP8266 NodeMCU:** Handles Wi-Fi communication and updates data to the Blynk cloud.
-* **Blynk App Integration:** Displays live readings from the LDRs, current servo position, and provides LED control functionality.
+🔗 Serial Communication: ESP8266 and Arduino communicate over UART.
 
----
+🛠️ Hardware Components
+Component	Quantity
+Arduino UNO	1
+ESP8266 (e.g., NodeMCU)	1
+LDR (Light Sensor)	2
+10kΩ Resistor (for LDR voltage divider)	2
+Servo Motor (SG90 or similar)	1
+LED	1
+Breadboard + Jumper Wires	As needed
+USB Cable (for Arduino)	1
+Resistor (1kΩ) for TX to RX voltage divider	1
 
-## 📲 Blynk Integration
+🔌 Circuit Diagram
+Arduino Connections:
+LDR1: One end to 5V, other end to A0 with 10kΩ resistor to GND.
 
-This project uses the Blynk IoT platform for monitoring and controlling the solar tracker remotely.
+LDR2: One end to 5V, other end to A1 with 10kΩ resistor to GND.
 
-| Virtual Pin | Function    | Data Type | Description                             |
-| ----------- | ----------- | --------- | --------------------------------------- |
-| V0          | LDR1 Value  | Integer   | Shows analog value from LDR1 (A0)       |
-| V1          | LDR2 Value  | Integer   | Shows analog value from LDR2 (A1)       |
-| V2          | Servo Angle | Integer   | Displays current servo position (0–180) |
-| V3          | LED Toggle  | Switch    | Remotely turns an LED ON/OFF on Arduino |
+Servo Motor: Signal to pin 9, VCC to 5V, GND to GND.
 
----
+LED: Anode to pin 7 (with 220Ω resistor), cathode to GND.
 
-## 🧰 Hardware Requirements
+Serial (To ESP8266): TX (pin 1) → ESP8266 RX (via 1kΩ resistor), RX (pin 0) ← ESP8266 TX.
 
-| Component                 | Quantity |
-| ------------------------- | -------- |
-| Arduino Uno               | 1        |
-| ESP8266 NodeMCU           | 1        |
-| LDR (Light Sensor)        | 2        |
-| 10kΩ Resistors (for LDRs) | 2        |
-| Servo Motor (SG90)        | 1        |
-| LED                       | 1        |
-| 220Ω Resistor (for LED)   | 1        |
-| Jumper Wires              | Several  |
-| Breadboard                | 1        |
-| Power Supply (5V)         | 1        |
+ESP8266 Connections:
+TX (D7) → Arduino RX
 
----
+RX (D8) ← Arduino TX (through 1kΩ resistor)
 
-## 🖥️ Software Requirements
+VCC & GND: Connected to 3.3V and GND.
 
-* **Arduino IDE**
-* **ESP8266 Board Package** (via Board Manager)
-* **Blynk Library**
-* **Servo Library**
-* **Blynk Template Configuration**
+Flash via USB then switch to communication mode.
 
-  * `Template ID`, `Template Name`, `Auth Token`
+📱 Blynk Configuration
+Use Blynk IoT Platform and configure the following:
 
----
+⚙️ Datastreams (Virtual Pins)
+Virtual Pin	Name	Type	Data Type	Range	Description
+V0	LDR1 Value	Input	Integer	0–1023	Displays value of LDR1
+V1	LDR2 Value	Input	Integer	0–1023	Displays value of LDR2
+V2	Servo Angle	Input	Integer	0–180	Shows current servo angle
+V3	LED Control	Switch	Integer	0 or 1	Turns LED ON/OFF
 
-## ⚡ Circuit Diagram
+🧠 How It Works
+LDRs detect light intensity on two sides of the panel.
 
-### Arduino Uno:
+Arduino calculates the difference and adjusts the servo to tilt toward stronger light.
 
-| Component   | Pin                              |
-| ----------- | -------------------------------- |
-| LDR1        | A0                               |
-| LDR2        | A1                               |
-| Servo Motor | Pin 9                            |
-| LED         | Pin 7                            |
-| Arduino TX  | ESP8266 D7 (via voltage divider) |
-| Arduino RX  | ESP8266 D8 (via 1kΩ resistor)    |
+The ESP8266 receives sensor and servo data from Arduino via serial and sends it to Blynk Cloud.
 
-### ESP8266 NodeMCU:
+Users can monitor LDR values, current servo angle, and control the LED remotely using Blynk.
 
-| Component | Pin                            |
-| --------- | ------------------------------ |
-| D7 (RX)   | ← Arduino TX (through divider) |
-| D8 (TX)   | → Arduino RX (through 1kΩ)     |
+Blynk switch (V3) sends commands to ESP8266 which then relays the message to Arduino to toggle the LED.
 
-> ⚠️ Make sure to use a voltage divider between Arduino TX (5V) and ESP8266 RX (3.3V).
-
----
-
-## ⚙️ Functional Description
-
-* **LDR Reading:** Arduino continuously reads values from both LDRs.
-* **Servo Control:** If LDR1 > LDR2, servo turns left; if LDR2 > LDR1, servo turns right. The movement is smooth and adaptive based on the light difference.
-* **LED Control:** LED on Arduino board can be toggled from Blynk via V3 switch.
-* **ESP8266 Communication:** ESP8266 and Arduino communicate via Software Serial. ESP8266 handles Blynk communication and relays LED commands to Arduino. It also receives LDR readings and servo angle from Arduino and sends them to Blynk.
-
----
-
-## 💬 Communication Protocol
-
-* **From Arduino to ESP8266:**
-  A comma-separated string every 500ms in the format:
-  `LDR1,LDR2,ServoAngle,LEDStatus`
-  Example: `456,387,90,1`
-
-* **From ESP8266 to Arduino:**
-  LED control commands as a single character:
-  `'1'` to turn ON the LED
-  `'0'` to turn OFF the LED
-
----
-
-## 🔧 Arduino Code Highlights
-
-* Reads analog values from LDRs on A0 and A1.
-* Calculates light intensity difference and rotates the servo accordingly (within limits).
-* Responds to LED ON/OFF command from ESP8266.
-* Sends sensor data to ESP8266 via Serial.
-
----
-
-## 🔧 ESP8266 Code Highlights
-
-* Connects to Wi-Fi and Blynk using Auth Token.
-* Receives LED toggle commands from Blynk and forwards them to Arduino.
-* Reads Arduino's serial output, parses values, and updates Blynk:
-
-  * V0 ← LDR1
-  * V1 ← LDR2
-  * V2 ← Servo Angle
-  * V3 ← LED Status
-
----
-
-## 🧪 Real-Time Monitoring (via Blynk)
-
-| Data        | Widget Type | Pin | Range            |
-| ----------- | ----------- | --- | ---------------- |
-| LDR1        | Gauge       | V0  | 0–1023           |
-| LDR2        | Gauge       | V1  | 0–1023           |
-| Servo Angle | Gauge       | V2  | 0–180            |
-| LED Control | Button      | V3  | 0 (OFF) / 1 (ON) |
-
----
-
-## 🚀 How to Run the Project
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/yourusername/IoT-Solar-Tracker.git
-   cd IoT-Solar-Tracker
-   ```
-
-2. Open the **Arduino sketch**:
-
-   * `Arduino/Arduino_Solar_Tracker.ino`
-   * Upload it to **Arduino Uno**
-
-3. Open the **ESP8266 sketch**:
-
-   * `ESP8266/ESP8266_Blynk_Comm.ino`
-   * Replace Wi-Fi credentials and Blynk token
-   * Upload it to **NodeMCU**
-
-4. Connect hardware as per schematic
-
-5. Open Blynk mobile app → Create a dashboard → Add virtual widgets (V0–V3)
-
-6. Power both boards and observe the servo rotating based on light intensity
-
----
-
-## 📂 Folder Structure
-
-```
+🔄 File Structure
+bash
+Copy
+Edit
 IoT-Solar-Tracker/
 │
-├── Arduino/
-│   └── Arduino_Solar_Tracker.ino
+├── arduino/
+│   └── solar_tracker_arduino.ino       # Arduino code (LDRs, servo, LED)
 │
-├── ESP8266/
-│   └── ESP8266_Blynk_Comm.ino
+├── esp8266/
+│   └── solar_tracker_esp8266.ino       # ESP8266 code (Blynk + serial)
 │
-├── schematic/
-│   ├── circuit_diagram.png
-│   └── pcb_layout.png
+├── circuit/
+│   └── solar_tracker_circuit.png       # Optional circuit diagram image
 │
-├── docs/
-│   └── user_manual.pdf
-│
-└── README.md
-```
+└── README.md                           # Project description and setup
+🧾 Installation Steps
+Install Arduino IDE
 
----
+Install libraries:
 
-## 📝 Future Improvements
+ESP8266 Board (via Board Manager)
 
-* Add auto/manual switch mode in Blynk
-* Add temperature sensor for solar panel health
-* Integrate real-time clock (RTC) for timed resets
-* Add battery voltage monitoring
+Blynk library (BlynkSimpleEsp8266)
 
----
+Servo library
+
+Upload the Arduino sketch to Arduino Uno.
+
+Upload the ESP8266 sketch to NodeMCU.
+
+Connect ESP8266 TX/RX with Arduino as shown.
+
+Create your project in Blynk, set up widgets as described.
+
+Power up both boards and observe live updates on your Blynk app.
+
+🚀 Future Improvements
+Dual-axis tracking using 2 servos.
+
+Integration with solar panel power monitoring.
+
+Display panel using OLED or LCD.
+
+Battery-powered standalone operation.
 
 ## 👨‍💻 Author
 
