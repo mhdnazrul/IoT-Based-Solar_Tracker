@@ -31,7 +31,7 @@ This project is designed to create an **IoT-based solar tracking system** that a
 ---
 
 ## 🔌 Circuit Diagram
-
+[Circuit Diagram](https://app.cirkitdesigner.com/project/682f68c8-25b9-4408-bdd3-21cf7e60866f)
 ### Arduino Connections:
 
 * **LDR1**: One end to `5V`, other end to `A0` with 10kΩ resistor to `GND`.
