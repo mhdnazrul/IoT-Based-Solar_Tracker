@@ -202,4 +202,4 @@ IoT-Solar-Tracker/
 **Nazrul Islam**
 Department of Computer Science & Engineering
 Premier University, Chattogram
-🔗 [LinkedIn]([https://www.linkedin.com](https://www.linkedin.com/in/nazulislam/))
+🔗 [LinkedIn](https://www.linkedin.com/in/nazulislam/)
